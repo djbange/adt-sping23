@@ -1,0 +1,159 @@
+---
+title: "sqlite in R"
+author: "Dipak Bange"
+date: "2/6/2022"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+Uncomment the code below once to install necessary libraries, then comment again. You only need it once.
+
+```{r}
+#install.packages("RSQLite")
+#install.packages("DBI")
+```
+
+Load the RSQLite Library
+
+```{r}
+library(RSQLite)
+library(DBI)
+```
+
+## Creating Database
+
+### Step 1.
+
+Creating connection and database. We call database CarsDB.db and we are going to use mtcars dataset
+
+```{r}
+conn <- dbConnect(RSQLite::SQLite(), dbname = "CarsDB.db")
+```
+
+Note - when you save your file, your should see CarsDB.db in your directory.
+
+### Step 2.
+
+We are cleaning data mtcars
+
+```{r}
+data("mtcars")
+head(mtcars) # this is what it looks like with car names as row names
+# row names are like row indices
+mtcars$car_names <- rownames(mtcars) # creating a new column from row names
+rownames(mtcars) <- c() # table row names are converted back to numeric indices (no names)
+head(mtcars)
+```
+
+### Step 3.
+
+Insert data to database. Note - once you done with Step 3, you need to add eval=FALSE inside the curly brackets `{r eval=FALSE}`
+
+```{r eval = FALSE}
+# Write the mtcars dataset into a table names mtcars_data
+ dbWriteTable(conn, "cars_data", mtcars)
+# List all the tables available in the database
+dbListTables(conn) 
+```
+
+### Step 4.
+
+Append tables. Note - once you done with Step 4, you need to add eval=FALSE inside the curly brackets `{r eval=FALSE}`
+
+```{r}
+# Create toy data frames
+car <- c('Camaro', 'California', 'Mustang', 'Explorer')
+make <- c('Chevrolet','Ferrari','Ford','Ford')
+df1 <- data.frame(car,make)
+car <- c('Corolla', 'Lancer', 'Sportage', 'XE')
+make <- c('Toyota','Mitsubishi','Kia','Jaguar')
+df2 <- data.frame(car,make)
+# Add them to a list
+dfList <- list(df1,df2)
+# Write a table by appending the data frames inside the list
+for(k in 1:length(dfList)){
+    dbWriteTable(conn,"Cars_and_Makes", dfList[[k]], append = TRUE)
+}
+# List all the Tables
+dbListTables(conn)
+```
+
+### Step 5. Queries
+
+Query 1. Gather data from Cars_and_Makes
+
+```{r}
+dbGetQuery(conn, "SELECT * FROM Cars_and_Makes")
+```
+
+Query 2: Gather the first 10 rows in the cars_data table
+
+```{r}
+dbGetQuery(conn, "SELECT * FROM cars_data LIMIT 10")
+```
+
+Query 3. Get the car names and horsepower of the cars with 8 cylinders
+
+```{r}
+dbGetQuery(conn,"SELECT car_names, hp, cyl FROM cars_data WHERE cyl = 8;")
+```
+
+Query 4.Get the car names and horsepower starting with M that have 6 or 8 cylinders
+
+```{r}
+dbGetQuery(conn,"SELECT car_names, hp, cyl FROM cars_data
+                 WHERE car_names LIKE 'M%' AND cyl IN (6,8)")
+
+```
+
+Query 5. Get the average horsepower and mpg by number of cylinder groups
+
+```{r}
+dbGetQuery(conn,"SELECT cyl, AVG(hp) AS 'average_hp', AVG(mpg) AS 'average_mpg' FROM cars_data
+                 GROUP BY cyl
+                 ORDER BY average_hp")
+```
+
+### Step 4. Storing
+
+```{r}
+avg_HpCyl <- dbGetQuery(conn,"SELECT cyl, AVG(hp) AS 'average_hp'FROM cars_data
+                 GROUP BY cyl
+                 ORDER BY average_hp")
+avg_HpCyl
+class(avg_HpCyl)
+```
+
+### Step 5. Parametrized Queries
+
+```{r}
+mpg <-  18
+cyl <- 6
+Result <- dbGetQuery(conn, 'SELECT car_names, mpg, cyl FROM cars_data WHERE mpg >= ? AND cyl >= ?', params = c(mpg,cyl))
+Result
+```
+
+### Step 6. Inserting and Deleting
+
+```{r}
+# Insert the data for the Mazda RX4. This will also ouput a 1
+dbExecute(conn, "INSERT INTO cars_data VALUES (21.0,6,160.0,110,3.90,2.620,16.46,0,1,4,4,'Mazda RX4')")
+
+# Delete the column belonging to the Mazda RX4. You will see a 1 as the output.
+dbExecute(conn, "DELETE FROM cars_data WHERE car_names = 'Mazda RX4'")
+
+dbGetQuery(conn, "SELECT * FROM cars_data")
+```
+
+### Step 7. Disconnecting
+
+Once you are done operating with your SQLite database within R, it is important to call the function `dbDisconnect()`. This ensures that we release any resources that the database connection has been using, which is always a good practice.
+
+```{r}
+dbDisconnect(conn)
+```

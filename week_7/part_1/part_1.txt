@@ -1,0 +1,40 @@
+PART 1:
+
+Q1.
+    Query: {"birth year": 1980}
+Q2.
+    Query: {"birth year":{$gt:1999}}
+Q3. 
+    Query: {"birth year":{$gt:1999}}
+    LIMIt: 4
+Q4. 
+    Query: {"birth year":{$gt:1999}}
+    LIMIt: 4
+Q5. 
+    Query: {"birth year":{$gt:1999,$lt:2001}}
+    LIMIt: 4
+Q6. 
+    Query: {"birth year":{$gte:1999}}
+    LIMIt: 4
+Q7. 
+    Query: {"wind.type": "C"}
+    LIMIt: 4
+Q8. 
+    Query: {"wind.direction.quality": "1"}
+    LIMIt: 4
+Q9. 
+    Query: {runtime: {$gte: 90}, "viewerRating": {$gt: 7}}
+    PROJECTION: {_id: 0, title: 1, runtime: 1}
+    LIMIt: 4
+Q10. 
+    Query: {"genre": {$ne: ""}}
+    PROJECTION: {_id: 0, title: 1, genre: 1}
+    LIMIt: 4
+Q11. 
+    Query: {genre: {$in: ['Short','Drama']}}
+    PROJECTION: {_id: 0, title: 1, genre: 1}
+    LIMIt: 4
+Q12. 
+    Query: {language: {$exists: true}}
+    PROJECTION: {_id: 0, title: 1, language: 1}
+    LIMIt: 4
