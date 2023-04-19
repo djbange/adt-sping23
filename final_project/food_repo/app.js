@@ -17,18 +17,18 @@ const { bodyParserHandler, globalErrorHandler, fourOhFourHandler, fourOhFiveHand
 connectToDatabase();
 
 logger.info("Started app");
-// body parser setup
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json({ type: "*/*" }));
-app.use(bodyParserHandler); // error handling specific to body parser only
 
 // response headers setup; CORS
 // app.use(globalResponseHeaders);
 
 // routes
 app.use(adminBro.adminBro.options.rootPath, adminBro.router);
-app.use('/', (req, res)=> res.send("Hello World"));
+app.use('/', (req, res)=> res.redirect(adminBro.adminBro.options.rootPath));
 
+// body parser setup
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ type: "*/*" }));
+app.use(bodyParserHandler); // error handling specific to body parser only
 
 // catch-all for 404 "Not Found" errors
 // app.get("*", fourOhFourHandler);

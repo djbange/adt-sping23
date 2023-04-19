@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon -r ./app.js"
+    "start": "nodemon -r ./app.js",
+    "prod": "node -r ./app.js"
   },
   "dependencies": {
     "@adminjs/express": "^5.1.0",
@@ -29,15 +30,6 @@
     "express-formidable": "^1.2.0",
     "express-session": "^1.17.3",
     "pg": "^8.10.0",
-    "react": "^16.14.0",
-    "react-ace": "^6.5.0",
-    "react-docgen": "^4.1.1",
-    "react-dom": "^16.14.0",
-    "react-redux": "^7.0.3",
-    "react-router-dom": "^5.0.0",
-    "react-select": "^2.4.3",
-    "recharts": "^2.5.0",
-    "redux": "^4.0.1",
     "regenerator-runtime": "^0.13.3",
     "sequelize": "^6.24.0",
     "sequelize-cli": "^5.4.0",
