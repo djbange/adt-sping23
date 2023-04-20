@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon -r ./app.js",
+    "start": "node -r ./app.js",
+    "dev": "nodemon -r ./app.js",
     "prod": "node -r ./app.js"
   },
   "dependencies": {
